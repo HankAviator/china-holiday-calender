@@ -1,6 +1,8 @@
 name: Build Holiday Calendars
 
 on:
+  schedule:
+    - cron: '0 */6 * * *'
   workflow_dispatch:
   push:
     branches:
@@ -12,6 +14,9 @@ on:
 
 permissions:
   contents: write
+
+env:
+  UPSTREAM_HOLIDAY_API_URL: https://raw.githubusercontent.com/lanceliao/china-holiday-calender/master/holidayAPI.json
 
 jobs:
   build-calendars:
@@ -25,11 +30,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: Sync holiday data from upstream
+        run: curl -fsSL "$UPSTREAM_HOLIDAY_API_URL" -o holidayAPI.json
+
       - name: Generate ICS files
         run: node generate-ics.js
 
       - name: Commit generated calendars
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: regenerate holiday calendars"
-          file_pattern: holidayCal.ics holidayCal-HO.ics holidayCal-CO.ics
+          commit_message: "chore: sync upstream holiday calendars"
+          file_pattern: holidayAPI.json holidayCal.ics holidayCal-HO.ics holidayCal-CO.ics

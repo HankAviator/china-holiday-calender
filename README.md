@@ -7,9 +7,10 @@
 2023~2026年中国放假、调休和补班日历 更新时间2025-11-04 23:59:04
 
 ## 生成方式
-这个 fork 现在直接使用 GitHub Actions 生成日历文件，不再依赖外部 webhook。
+这个 fork 现在直接使用 GitHub Actions 同步上游数据并生成日历文件，不再依赖外部 webhook。
 
-- 修改 `holidayAPI.json` 或 `generate-ics.js` 后，push 到 `master` 会自动重新生成 `holidayCal.ics`、`holidayCal-HO.ics`、`holidayCal-CO.ics`
+- GitHub Actions 每6小时检查一次上游仓库的 `holidayAPI.json`，如果上游有变化，就会同步并重新生成 `holidayCal.ics`、`holidayCal-HO.ics`、`holidayCal-CO.ics`
+- 修改 `holidayAPI.json` 或 `generate-ics.js` 后，push 到 `master` 也会自动重新生成日历文件
 - 也可以在 GitHub 的 `Actions` 页面手动运行 `Build Holiday Calendars`
 - 本地手动生成命令：`node generate-ics.js`
 
