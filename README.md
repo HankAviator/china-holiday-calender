@@ -9,10 +9,11 @@
 ## 生成方式
 这个 fork 现在直接使用 GitHub Actions 同步上游数据并生成日历文件，不再依赖外部 webhook。
 
-- GitHub Actions 每6小时检查一次上游仓库的 `holidayAPI.json`，如果上游有变化，就会同步并重新生成 `holidayCal.ics`、`holidayCal-HO.ics`、`holidayCal-CO.ics`
+- GitHub Actions 每6小时检查一次上游仓库的 `holidayAPI.json`，只有上游数据真的变化时，才会同步并重新生成 `holidayCal.ics`、`holidayCal-HO.ics`、`holidayCal-CO.ics`
 - 修改 `holidayAPI.json` 或 `generate-ics.js` 后，push 到 `master` 也会自动重新生成日历文件
 - 也可以在 GitHub 的 `Actions` 页面手动运行 `Build Holiday Calendars`
 - 本地手动生成命令：`node generate-ics.js`
+- 生成出来的 ICS 时间戳优先使用 `holidayAPI.json` 里的 `Generated` 字段，因此在上游数据不变时不会因为重新生成而产生无意义差异
 
 ### 支持3种类型的日历
 - `holidayCal.ics` 包含放假和调休

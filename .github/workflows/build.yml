@@ -30,13 +30,28 @@ jobs:
         with:
           node-version: 20
 
-      - name: Sync holiday data from upstream
-        run: curl -fsSL "$UPSTREAM_HOLIDAY_API_URL" -o holidayAPI.json
+      - name: Check upstream holiday data
+        id: upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp_file="$(mktemp)"
+          trap 'rm -f "$temp_file"' EXIT
+          curl -fsSL "$UPSTREAM_HOLIDAY_API_URL" -o "$temp_file"
+
+          if cmp -s "$temp_file" holidayAPI.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            mv "$temp_file" holidayAPI.json
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Generate ICS files
+        if: steps.upstream.outputs.changed == 'true' || github.event_name != 'schedule'
         run: node generate-ics.js
 
       - name: Commit generated calendars
+        if: steps.upstream.outputs.changed == 'true' || github.event_name != 'schedule'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: sync upstream holiday calendars"

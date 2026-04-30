@@ -59,6 +59,14 @@ function formatDateTime(value) {
   ].join('');
 }
 
+function normalizeStamp(value) {
+  if (typeof value === 'string' && /^\d{8}T\d{6}Z$/.test(value)) {
+    return value;
+  }
+
+  return formatDateTime(new Date());
+}
+
 function formatLocalDateTime(dateString, timeString) {
   return `${formatDate(dateString)}T${timeString}`;
 }
@@ -192,7 +200,7 @@ function flattenCalendar(lines, events) {
 
 function main() {
   const data = JSON.parse(fs.readFileSync(INPUT_FILE, 'utf8'));
-  const stamp = formatDateTime(new Date());
+  const stamp = normalizeStamp(data.Generated);
   const years = Object.keys(data.Years).sort();
   const yearRange = `${years[0]}~${years[years.length - 1]}年`;
 
