@@ -1,15 +1,35 @@
-name: Rebuild shuyz.com website
+name: Build Holiday Calendars
 
 on:
   workflow_dispatch:
   push:
     branches:
       - master
+    paths:
+      - holidayAPI.json
+      - generate-ics.js
+      - .github/workflows/build.yml
+
+permissions:
+  contents: write
 
 jobs:
-  rebuild_shuyz_website:
+  build-calendars:
     runs-on: ubuntu-latest
     steps:
-      - name: Execute cURL POST request to rebuild shuyz.com
-        run: |
-          curl -X POST ${{ secrets.CI_WEBHOOK }}
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate ICS files
+        run: node generate-ics.js
+
+      - name: Commit generated calendars
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: regenerate holiday calendars"
+          file_pattern: holidayCal.ics holidayCal-HO.ics holidayCal-CO.ics
